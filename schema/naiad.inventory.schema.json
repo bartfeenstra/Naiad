@@ -1,0 +1,66 @@
+{
+  "description": "Naiad inventory",
+  "type": "object",
+  "required": ["name", "inventory"],
+  "additionalProperties": false,
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "inventory": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "care"],
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "care": {
+            "type": "object",
+            "required": ["moisture"],
+            "additionalProperties": false,
+            "properties": {
+              "moisture": {
+                "type": "object",
+                "required": ["feed"],
+                "additionalProperties": false,
+                "properties": {
+                  "feed": {
+                    "type": "object",
+                    "required": ["schedule", "controller"],
+                    "additionalProperties": false,
+                    "properties": {
+                      "schedule": {
+                        "type": "object",
+                        "required": ["interval", "volume"],
+                        "additionalProperties": false,
+                        "properties": {
+                          "interval": {
+                            "type": "integer"
+                          },
+                          "volume": {
+                            "type": "number",
+                            "minimum": 0.001,
+                            "maximum": 1
+                          }
+                        }
+                      },
+                      "controller": {
+                        "$ref": "./controller.json"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

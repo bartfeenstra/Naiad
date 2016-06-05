@@ -1,0 +1,25 @@
+{
+  "name": "Bart's plants",
+  "description": "Herbs and vegetables for your daily delicacies.",
+  "inventory": [
+    {
+      "name": "Basil",
+      "care": {
+        "moisture": {
+          "feed": {
+            "schedule": {
+              "interval": 3600,
+              "volume": 0.01
+            },
+            "controller": {
+              "class": "naiad_raspberrypi.GpioMoistureFeed",
+              "configuration": {
+                "pin": 4
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

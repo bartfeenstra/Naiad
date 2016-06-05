@@ -1,0 +1,9 @@
+{
+  "notifications": {
+    "email": {
+      "recipients": [
+        "notify@example.com"
+      ]
+    }
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "description": "Naiad configuration",
+  "type": "object",
+  "required": ["notifications"],
+  "additionalProperties": false,
+  "properties": {
+    "notifications": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "email": {
+          "type": "object",
+          "required": ["recipients"],
+          "additionalProperties": false,
+          "properties": {
+            "recipients": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "email"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

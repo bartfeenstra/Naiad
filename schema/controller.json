@@ -1,0 +1,15 @@
+{
+  "description": "Naiad hardware controller",
+  "type": "object",
+  "required": ["class"],
+  "additionalProperties": false,
+  "properties": {
+    "class": {
+      "type": "string"
+    },
+    "configuration": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  }
+}
