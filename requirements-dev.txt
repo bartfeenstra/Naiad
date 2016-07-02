@@ -1,3 +1,0 @@
--r ./requirements.txt
-nose ~= 1.2
-sphinx ~= 1.4

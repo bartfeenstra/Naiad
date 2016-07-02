@@ -1,6 +1,6 @@
 import os
 import sys
-from naiad_core import Configuration, Inventory, Naiad
+from .naiad_core import Configuration, Inventory, Naiad
 
 
 def get_working_directory():
@@ -10,15 +10,15 @@ def get_working_directory():
     """
     # There must be a single argument or none at all, but the first one is the script itself.
     if 1 > len(sys.argv) > 2:
-        # @todo Find the correct exception class and set a message.
-        raise Exception
+        raise Exception(
+            'This script accepts one argument which must be the working directory, but %d arguments were given.' % (
+                len(sys.argv)))
 
     # If there is an argument, use it as the working directory.
     if len(sys.argv) == 2:
         working_directory = sys.argv[1]
         if not os.path.exists(working_directory):
-            # @todo Find the correct exception class and set a message.
-            raise Exception
+            raise Exception('Working directory %s does not exist.' % working_directory)
     # Use the script's current working directory as the default.
     else:
         working_directory = os.getcwd()
