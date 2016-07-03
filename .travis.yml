@@ -9,4 +9,7 @@ install:
     - pip install -r ./travis-ci/requirements.txt
 
 script:
-    - nose2
+    - coverage run -m nose2
+
+after_success:
+    - coveralls
