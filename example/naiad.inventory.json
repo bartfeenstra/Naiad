@@ -12,7 +12,7 @@
               "volume": 0.01
             },
             "controller": {
-              "class": "naiad_raspberrypi.GpioMoistureFeed",
+              "class": "naiad.rpi#GpioMoistureFeed",
               "configuration": {
                 "pin": 4
               }
