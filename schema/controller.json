@@ -5,7 +5,9 @@
   "additionalProperties": false,
   "properties": {
     "class": {
-      "type": "string"
+      "description": "The controller's module name and class name, separated by a hash/pound. Example: foo.bar#Baz",
+      "type": "string",
+      "pattern": "^[^#]+#[^#]+$"
     },
     "configuration": {
       "type": "object",
