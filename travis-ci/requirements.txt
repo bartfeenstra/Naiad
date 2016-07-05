@@ -1,3 +1,2 @@
 -r ../requirements-dev.txt
 coveralls ~= 1.0
-virtualenv ~= 15.0
