@@ -5,4 +5,4 @@ from unittest import TestCase
 class TestMain(TestCase):
     def testExecution(self):
         working_directory = './example/'
-        run(['python', '-m', 'naiad', working_directory])
+        run(['python', '-m', 'naiad', '-d', working_directory])
