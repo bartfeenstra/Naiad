@@ -8,14 +8,29 @@
         "moisture": {
           "feed": {
             "schedule": {
-              "interval": 3600,
-              "volume": 0.01
+              "interval": 5,
+              "volume": 0.05
             },
             "controller": {
-              "class": "naiad.rpi#GpioMoistureFeed",
-              "configuration": {
-                "pin": 4
-              }
+              "class": "naiad.example#ExampleMoistureFeedController",
+              "configuration": {}
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "Strawberries",
+      "care": {
+        "moisture": {
+          "feed": {
+            "schedule": {
+              "interval": 3,
+              "volume": 0.03
+            },
+            "controller": {
+              "class": "naiad.example#ExampleMoistureFeedController",
+              "configuration": {}
             }
           }
         }

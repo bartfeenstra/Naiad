@@ -1,5 +1,6 @@
-from naiad.core import Configuration, Controller, Inventory, Naiad
+from naiad.core import Configuration, Controller, Inventory, MoistureFeedTask, MoistureFeedController, Task
 from unittest import TestCase
+from unittest.mock import Mock
 from jsonschema.exceptions import ValidationError
 
 
@@ -28,6 +29,19 @@ class TestInventory(TestCase):
         with self.assertRaises(FileNotFoundError):
             Inventory('foo')
 
+    def testGetController(self):
+        definition = 'test_core#TestNaiadDummyController'
+        configuration = dict()
+        controller = Inventory._get_controller(definition, configuration)
+        self.assertIsInstance(controller, Controller)
+
+    def testGetTasks(self):
+        inventory = Inventory('./example/naiad.inventory.json')
+        tasks = inventory.get_tasks()
+        self.assertIsInstance(tasks, list)
+        for task in tasks:
+            self.assertIsInstance(task, Task)
+
 
 class TestController(TestCase):
     def testCreateInstance(self):
@@ -36,12 +50,17 @@ class TestController(TestCase):
         self.assertIsInstance(controller, Controller)
 
 
+class TestMoistureFeedTask(TestCase):
+    def test__Init__(self):
+        interval = 7
+        controller = Mock(spec=MoistureFeedController)
+        volume = 0.123
+        task = MoistureFeedTask(interval, controller, volume)
+        self.assertIsInstance(task, MoistureFeedTask)
+
+
 class TestNaiad(TestCase):
-    def testGetController(self):
-        definition = 'test_core#TestNaiadDummyController'
-        configuration = dict()
-        controller = Naiad._controller_get(definition, configuration)
-        self.assertIsInstance(controller, Controller)
+    pass
 
 
 class TestNaiadDummyController(Controller):

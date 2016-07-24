@@ -6,6 +6,67 @@ import os
 import importlib
 import re
 import sys
+import time
+from threading import Thread
+from typing import List
+
+
+class Controller:
+    @contract
+    def __init__(self, configuration: object = {}):
+        """
+        :type configuration: object
+        """
+        self._configuration = configuration
+
+    @classmethod
+    @contract
+    def create_instance(cls, configuration: object):
+        """
+        :type configuration: object
+        :rtype naiad.core.Controller
+        """
+        return cls(configuration)
+
+
+class MoistureFeedController(Controller):
+    @abc.abstractmethod
+    @contract
+    def feed(self, volume: float):
+        """
+        :type volume: float
+        :rtype None
+        """
+        pass
+
+
+class Task:
+    @abc.abstractmethod
+    def execute(self):
+        """
+        Executes the task.
+        """
+        pass
+
+
+class MoistureFeedTask(Task):
+    @contract
+    def __init__(self, interval: int, controller: MoistureFeedController, volume: float):
+        """
+        :type interval: int
+        :param interval: The task's execution interval in seconds.
+        :type controller: naiad.core.MoistureFeedController
+        :type volume: float
+        :param volume: The volume to feed in liters.
+        """
+        self._interval = interval
+        self._controller = controller
+        self._volume = volume
+
+    def execute(self):
+        while True:
+            self._controller.feed(self._volume)
+            time.sleep(self._interval)
 
 
 class Configuration:
@@ -37,26 +98,38 @@ class Inventory:
         inventory = json.load(open(inventory_file_path, 'r'))
         validate(inventory, json.load(open(inventory_schema_file_path, 'r')),
                  resolver=inventory_schema_reference_resolver)
-
         self._inventory = inventory
 
-
-class Controller:
     @contract
-    def __init__(self, configuration: object):
+    def get_tasks(self) -> List[Task]:
         """
-        :type configuration: object
+        :rtype: naiad.core.Task[]
         """
-        self._configuration = configuration
+        tasks = []
+        for target in self._inventory['inventory']:
+            controller = self._get_controller(target['care']['moisture']['feed']['controller']['class'], target['care']['moisture']['feed']['controller']['configuration'])
+            tasks.append(MoistureFeedTask(target['care']['moisture']['feed']['schedule']['interval'], controller, target['care']['moisture']['feed']['schedule']['volume']))
 
-    @classmethod
+        return tasks
+
+
+    @staticmethod
     @contract
-    def create_instance(cls, configuration: object):
+    def _get_controller(definition: str, configuration: object) -> Controller:
         """
+        :type definition: str
         :type configuration: object
         :rtype naiad.core.Controller
         """
-        return cls(configuration)
+        if not re.fullmatch('^[^#]+#[^#]+$', definition):
+            raise ValueError(
+                'A controller definition must be a module name and aclass name, separated by a hash/pound, but "%s" was given. Example: foo.bar#Baz' % definition)
+        module_name, class_name = definition.split('#', 1)
+        importlib.import_module(module_name)
+        module = sys.modules[module_name]
+        controller_class = getattr(module, class_name)
+
+        return controller_class.create_instance(configuration)
 
 
 class Naiad:
@@ -70,36 +143,13 @@ class Naiad:
         self._inventory = inventory
 
     def run(self):
-        # Parse the inventory + config and create a list of actions to take. This will support any future actions other
-        # than moisture. Then create an infinite loop that goes over the actions every second. For every action,
-        # check if it must be executed. If so, do so.
-        pass
-
-    @staticmethod
-    @contract
-    def _controller_get(definition: str, configuration: object) -> Controller:
         """
-        :type definition: str
-        :type configuration: object
-        :rtype naiad.core.Controller
+        Runs Naiad.
         """
-        if not re.fullmatch('^[^#]+#[^#]+$', definition):
-            raise ValueError(
-                'A controller definition must be a module name and aclass name, separated by a hash/pound, but "%s" was given. Example: foo.bar#Baz' % definition)
-        module_name, class_name = definition.split('#', 1)
-        module = sys.modules[module_name]
-        importlib.import_module(module_name)
-        controller_class = getattr(module, class_name)
-
-        return controller_class.create_instance(configuration)
-
-
-class MoistureFeedController(Controller):
-    @abc.abstractmethod
-    @contract
-    def feed(self, volume: int):
-        """
-        :type volume: int
-        :rtype None
-        """
-        pass
+        threads = []
+        for task in self._inventory.get_tasks():
+            thread = Thread(None, task.execute)
+            thread.start()
+            threads.append(thread)
+        for thread in threads:
+            thread.join()
